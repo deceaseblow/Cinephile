@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.screens.*
+import com.example.myapplication.ui.theme.MovieAppTheme
 import com.example.myapplication.viewmodel.MovieViewModel
 
 class MainActivity : ComponentActivity() {
@@ -18,77 +19,94 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val navController = rememberNavController()
+            MovieAppTheme {
+                val navController = rememberNavController()
 
-            NavHost(navController = navController, startDestination = "loading") {
+                NavHost(navController = navController, startDestination = "loading") {
 
-                // Loading screen (initial fetch)
-                composable("loading") {
-                    val isLoading = viewModel.isLoading.collectAsState().value
-                    LoadingScreen()
+                    // 🌀 Loading Screen
+                    composable("loading") {
+                        val isLoading = viewModel.isLoading.collectAsState().value
+                        LoadingScreen()
 
-                    LaunchedEffect(Unit) {
-                        viewModel.fetchMovies("popular")
-                    }
-
-                    if (!isLoading) {
                         LaunchedEffect(Unit) {
-                            navController.navigate("home") {
-                                popUpTo("loading") { inclusive = true }
+                            viewModel.fetchMovies("popular")
+                        }
+
+                        if (!isLoading) {
+                            LaunchedEffect(Unit) {
+                                navController.navigate("home") {
+                                    popUpTo("loading") { inclusive = true }
+                                }
                             }
                         }
                     }
-                }
 
-                // Home screen
-                composable("home") {
-                    HomeScreen(
-                        viewModel = viewModel,
-                        onSearch = { query ->
-                            navController.navigate("results/$query")
-                        },
-                        onMovieClick = { movieId ->
-                            navController.navigate("details/$movieId")
-                        }
-                    )
-                }
-
-                // 🔍 Search results screen
-                composable("results/{query}") { backStackEntry ->
-                    val query = backStackEntry.arguments?.getString("query") ?: ""
-                    ResultScreen(
-                        query = query,
-                        viewModel = viewModel,
-                        onSearch = { newQuery ->
-                            navController.navigate("results/$newQuery")
-                        },
-                        onMovieClick = { movieId ->
-                            navController.navigate("details/$movieId")
-                        }
-                    )
-                }
-
-                // 🎬 Movie details screen
-                composable("details/{movieId}") { backStackEntry ->
-                    val movieId = backStackEntry.arguments?.getString("movieId")?.toIntOrNull()
-                    val movie = viewModel.selectedMovie.collectAsState().value
-
-                    // Fetch movie details when navigating here
-                    LaunchedEffect(movieId) {
-                        if (movieId != null) {
-                            viewModel.fetchMovieDetails(movieId)
-                        }
+                    // Home Screen
+                    composable("home") {
+                        HomeScreen(
+                            viewModel = viewModel,
+                            onSearch = { query ->
+                                navController.navigate("results/$query")
+                            },
+                            onMovieClick = { movieId ->
+                                navController.navigate("details/$movieId")
+                            },
+                            onWatchlistClick = {
+                                navController.navigate("watchlist")
+                            }
+                        )
                     }
 
-                    movie?.let {
-                        DetailsScreen(
-                            movie = it,
-                            onBack = { navController.popBackStack() },
-                            onToggleFavorite = { viewModel.toggleFavorite(it.id) },
-                            onToggleWatchlist = { viewModel.toggleWatchlist(it.id) },
-                            onRateMovie = { rating -> viewModel.rateMovie(it.id, rating) }
+                    // Results Screen
+                    composable("results/{query}") { backStackEntry ->
+                        val query = backStackEntry.arguments?.getString("query") ?: ""
+
+                        ResultScreen(
+                            query = query,
+                            viewModel = viewModel,
+                            onMovieClick = { movieId ->
+                                navController.navigate("details/$movieId")
+                            },
+                            onBack = { navController.popBackStack() }
                         )
-                    } ?: LoadingScreen()
+                    }
+
+                    // Movie Details Screen
+                    composable("details/{movieId}") { backStackEntry ->
+                        val movieId = backStackEntry.arguments?.getString("movieId")?.toIntOrNull()
+                        val movie = viewModel.selectedMovie.collectAsState().value
+
+                        LaunchedEffect(movieId) {
+                            if (movieId != null) {
+                                viewModel.fetchMovieDetails(movieId)
+                            }
+                        }
+
+                        movie?.let {
+                            val isInWatchlist = viewModel.isInWatchlist(it.id)
+
+                            DetailsScreen(
+                                movie = it,
+                                inWatchlist = isInWatchlist,
+                                onBack = { navController.popBackStack() },
+                                onToggleFavorite = { viewModel.toggleFavorite(it.id) },
+                                onToggleWatchlist = { viewModel.toggleWatchlist(it.id) },
+                                onRateMovie = { rating -> viewModel.rateMovie(it.id, rating) }
+                            )
+                        } ?: LoadingScreen()
+                    }
+
+                    // Watch list Screen
+                    composable("watchlist") {
+                        WatchlistScreen(
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() },
+                            onMovieClick = { movieId ->
+                                navController.navigate("details/$movieId")
+                            }
+                        )
+                    }
                 }
             }
         }

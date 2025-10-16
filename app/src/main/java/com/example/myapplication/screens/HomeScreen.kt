@@ -1,69 +1,64 @@
 package com.example.myapplication.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.myapplication.components.MovieCard
 import com.example.myapplication.viewmodel.MovieViewModel
-import androidx.compose.runtime.collectAsState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: MovieViewModel,
     onSearch: (String) -> Unit,
-    onMovieClick: (Int) -> Unit
+    onMovieClick: (Int) -> Unit,
+    onWatchlistClick: () -> Unit
 ) {
+    val movies by viewModel.homeMovies.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
-    val movies by viewModel.movies.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF212121))
-            .padding(16.dp)
-    ) {
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            label = { Text("Search Movies", color = Color.Gray) },
-            textStyle = TextStyle(color = Color.White, fontSize = 16.sp),
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF1DB954),
-                unfocusedBorderColor = Color.DarkGray,
-                cursorColor = Color(0xFF1DB954)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Movie App") },
+                actions = {
+                    IconButton(onClick = onWatchlistClick) { // Go to watchlist
+                        Icon(Icons.Filled.Favorite, contentDescription = "Watchlist")
+                    }
+                }
             )
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(
-            onClick = { if (searchQuery.isNotBlank()) onSearch(searchQuery) },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1DB954))
-        ) {
-            Text("Search", color = Color.White)
         }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .padding(16.dp)
+                .fillMaxSize()
+        ) {
+            // 🔍 Search Bar
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                label = { Text("Search movies...") },
+                trailingIcon = {
+                    IconButton(onClick = { if (searchQuery.isNotBlank()) onSearch(searchQuery) }) {
+                        Icon(Icons.Filled.Search, contentDescription = "Search")
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        if (isLoading) {
-            LoadingScreen()
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(bottom = 16.dp)
-            ) {
+            // 🎬 Movie List
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(movies) { movie ->
                     MovieCard(
                         title = movie.title,

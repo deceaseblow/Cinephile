@@ -14,6 +14,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.example.myapplication.ui.theme.MovieAppTheme
 
 @Composable
 fun MovieCard(
@@ -27,7 +28,9 @@ fun MovieCard(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
     ) {
         Row(modifier = Modifier.padding(8.dp)) {
             Image(
@@ -40,7 +43,10 @@ fun MovieCard(
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.fillMaxWidth()) {
-                Text(title, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = title,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
                 Spacer(Modifier.height(4.dp))
                 Text("⭐ ${"%.1f".format(rating)}", style = MaterialTheme.typography.bodyMedium)
             }

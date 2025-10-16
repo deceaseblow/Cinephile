@@ -7,9 +7,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,14 +23,14 @@ import com.example.myapplication.model.Movie
 @Composable
 fun DetailsScreen(
     movie: Movie,
+    inWatchlist: Boolean,
     onBack: () -> Unit,
     onToggleFavorite: () -> Unit,
     onToggleWatchlist: () -> Unit,
     onRateMovie: (Float) -> Unit
 ) {
-    var rating by remember { mutableStateOf(movie.userRating ?: 0f) }
-    val isFavorite = remember { mutableStateOf(movie.isFavorite) }
-    val inWatchlist = remember { mutableStateOf(movie.inWatchlist) }
+    var isInWatchlist by remember { mutableStateOf(inWatchlist) }
+    var isFavorite by remember { mutableStateOf(movie.isFavorite) }
 
     Scaffold(
         topBar = {
@@ -54,8 +52,7 @@ fun DetailsScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            // 🎞️ Poster
+            // Poster
             Image(
                 painter = rememberAsyncImagePainter(model = movie.posterUrl),
                 contentDescription = movie.title,
@@ -68,98 +65,36 @@ fun DetailsScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // 📝 Info
             Text(
                 text = movie.title ?: "Unknown Title",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
-            Text(
-                text = "Release: ${movie.releaseDate ?: "N/A"}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = "Director: ${movie.director ?: "N/A"}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = "Cast: ${movie.cast ?: "N/A"}",
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Text("Release: ${movie.releaseDate ?: "N/A"}")
+            Text("Director: ${movie.director ?: "N/A"}")
+            Text("Cast: ${movie.cast ?: "N/A"}")
+
             Spacer(Modifier.height(8.dp))
-            Text(
-                text = movie.synopsis ?: "No synopsis available.",
-                style = MaterialTheme.typography.bodyLarge
-            )
+            Text(movie.synopsis ?: "No synopsis available.", style = MaterialTheme.typography.bodyMedium)
 
             Spacer(Modifier.height(24.dp))
 
-            // Rating Section
-            Text("Your Rating", style = MaterialTheme.typography.titleMedium)
-            RatingBar(
-                rating = rating,
-                onRatingChanged = {
-                    rating = it
-                    onRateMovie(it)
-                }
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            // Favorite & Watchlist
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Button(
-                    onClick = {
-                        isFavorite.value = !isFavorite.value
-                        onToggleFavorite()
-                    }
-                ) {
-                    Icon(
-                        imageVector = if (isFavorite.value) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                        contentDescription = "Favorite"
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(if (isFavorite.value) "Unfavorite" else "Favorite")
-                }
-
-                Button(
-                    onClick = {
-                        inWatchlist.value = !inWatchlist.value
-                        onToggleWatchlist()
-                    }
-                ) {
-                    Text(if (inWatchlist.value) "Remove from Watchlist" else "Add to Watchlist")
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun RatingBar(
-    rating: Float,
-    onRatingChanged: (Float) -> Unit,
-    modifier: Modifier = Modifier,
-    maxRating: Int = 5
-) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        for (i in 1..maxRating * 2) { // 0.5 increments
-            val current = i / 2f
-            val filled = current <= rating
-            IconButton(onClick = { onRatingChanged(current) }) {
-                Icon(
-                    imageVector = if (filled) Icons.Filled.Star else Icons.Outlined.Star,
-                    contentDescription = "$current stars",
-                    tint = if (filled)
+            // Watchlist button
+            Button(
+                onClick = {
+                    isInWatchlist = !isInWatchlist
+                    onToggleWatchlist()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isInWatchlist)
                         MaterialTheme.colorScheme.primary
                     else
-                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                        MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Text(
+                    if (isInWatchlist) "Remove from Watchlist" else "Add to Watchlist",
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
