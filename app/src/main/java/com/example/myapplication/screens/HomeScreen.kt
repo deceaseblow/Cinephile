@@ -1,5 +1,6 @@
 package com.example.myapplication.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,7 +10,9 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.myapplication.components.MovieCard
 import com.example.myapplication.viewmodel.MovieViewModel
 
@@ -20,9 +23,12 @@ fun HomeScreen(
     onSearch: (String) -> Unit,
     onMovieClick: (Int) -> Unit,
     onWatchlistClick: () -> Unit,
-    onRecommendationsClick: () -> Unit
+    onRecommendationsClick: () -> Unit,
+    navController: NavController
 ) {
+    val context = LocalContext.current
     val movies by viewModel.homeMovies.collectAsState()
+    val watchlist by viewModel.watchlist.collectAsState() // ✅ collect watchlist properly
     var searchQuery by remember { mutableStateOf("") }
 
     Scaffold(
@@ -66,6 +72,26 @@ fun HomeScreen(
                     .padding(vertical = 8.dp)
             ) {
                 Text("See Recommendations")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // 🧠 Take a Quiz Button
+            Button(
+                onClick = {
+                    if (watchlist.isEmpty()) {
+                        Toast.makeText(
+                            context,
+                            "Add a movie into your watchlist to take a quiz!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        navController.navigate("quiz")
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Take a Quiz now! ")
             }
 
             Spacer(modifier = Modifier.height(8.dp))

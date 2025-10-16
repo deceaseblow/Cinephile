@@ -12,6 +12,15 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.screens.*
 import com.example.myapplication.ui.theme.MovieAppTheme
 import com.example.myapplication.viewmodel.MovieViewModel
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import com.example.myapplication.utils.QuizGenerator
+import com.example.myapplication.utils.QuizQuestion
+import android.widget.Toast
+
 
 class MainActivity : ComponentActivity() {
     private val viewModel: MovieViewModel by viewModels()
@@ -55,11 +64,13 @@ class MainActivity : ComponentActivity() {
                             onWatchlistClick = {
                                 navController.navigate("watchlist")
                             },
-                            onRecommendationsClick = { // 👈 Navigate to Recommendations
+                            onRecommendationsClick = {
                                 navController.navigate("recommendations")
-                            }
+                            },
+                            navController = navController // ✅ Pass here
                         )
                     }
+
 
                     // Results Screen
                     composable("results/{query}") { backStackEntry ->
@@ -119,6 +130,58 @@ class MainActivity : ComponentActivity() {
                             onBack = { navController.popBackStack() } // ✅ Added back button handler
                         )
                     }
+
+                    // 🧩 Quiz Screen
+                    composable("quiz") {
+                        val watchlist = viewModel.watchlist.collectAsState().value
+
+                        // Check if we have enough movies first
+                        if (watchlist.size < 3) {
+                            LaunchedEffect(Unit) {
+                                Toast.makeText(
+                                    navController.context,
+                                    "Oh well, you need to have 3 movies in watchlist to take it!",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                navController.popBackStack()
+                            }
+                            return@composable
+                        }
+
+                        // Generate quiz directly from watchlist
+                        val questions = QuizGenerator.generateQuizQuestions(watchlist)
+
+                        if (questions.isEmpty()) {
+                            LaunchedEffect(Unit) {
+                                Toast.makeText(
+                                    navController.context,
+                                    "Not enough movie data to generate quiz questions!",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                navController.popBackStack()
+                            }
+                        } else {
+                            QuizScreen(
+                                questions = questions,
+                                onSubmit = { correct, total ->
+                                    navController.navigate("quizResult/$correct/$total")
+                                },
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
+                    }
+
+// 🏁 Quiz Result
+                    composable("quizResult/{correct}/{total}") { backStackEntry ->
+                        val correct = backStackEntry.arguments?.getString("correct")?.toIntOrNull() ?: 0
+                        val total = backStackEntry.arguments?.getString("total")?.toIntOrNull() ?: 0
+                        QuizResultScreen(
+                            correctCount = correct,
+                            totalCount = total,
+                            onBack = { navController.navigate("home") }
+                        )
+                    }
+
                 }
             }
         }

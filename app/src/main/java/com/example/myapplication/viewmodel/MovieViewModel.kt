@@ -8,6 +8,9 @@ import com.example.myapplication.model.Movie
 import com.example.myapplication.repository.MovieRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import com.example.myapplication.utils.QuizGenerator
+import com.example.myapplication.utils.QuizQuestion
+
 
 class MovieViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -99,5 +102,9 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
                 else movie
             }
         }
+    }
+
+    fun generateQuizQuestions(): List<QuizQuestion> {
+        return QuizGenerator.generateQuizQuestions(_watchlist.value)
     }
 }
