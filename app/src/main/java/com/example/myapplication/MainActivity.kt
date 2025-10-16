@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
 
             NavHost(navController = navController, startDestination = "loading") {
 
-                // 🌀 Loading screen (initial fetch)
+                // Loading screen (initial fetch)
                 composable("loading") {
                     val isLoading = viewModel.isLoading.collectAsState().value
                     LoadingScreen()
@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                // 🏠 Home screen
+                // Home screen
                 composable("home") {
                     HomeScreen(
                         viewModel = viewModel,

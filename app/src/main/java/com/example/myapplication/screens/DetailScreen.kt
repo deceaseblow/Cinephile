@@ -94,7 +94,7 @@ fun DetailsScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // ⭐ Rating Section
+            // Rating Section
             Text("Your Rating", style = MaterialTheme.typography.titleMedium)
             RatingBar(
                 rating = rating,
@@ -106,7 +106,7 @@ fun DetailsScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // ❤️ Favorite & 📋 Watchlist
+            // Favorite & Watchlist
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly

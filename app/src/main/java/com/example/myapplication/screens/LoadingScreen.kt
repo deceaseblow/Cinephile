@@ -22,7 +22,7 @@ fun LoadingScreen() {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator()
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Loading MusicApp...", fontSize = 20.sp)
+            Text(text = "Loadind Movieapp...", fontSize = 20.sp)
         }
     }
 }
