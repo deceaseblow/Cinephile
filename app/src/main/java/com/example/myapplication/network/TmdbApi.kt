@@ -24,6 +24,12 @@ interface TmdbApi {
         @Query("api_key") apiKey: String = BuildConfig.TMDB_API_KEY,
         @Query("append_to_response") append: String = "credits"
     ): MovieDetailsResponse
+
+    @GET("movie/{movie_id}/similar")
+    suspend fun getSimilarMovies(
+        @Path("movie_id") movieId: Int,
+        @Query("api_key") apiKey: String = BuildConfig.TMDB_API_KEY
+    ): MovieResponse
 }
 
 // Data classes for TMDb responses

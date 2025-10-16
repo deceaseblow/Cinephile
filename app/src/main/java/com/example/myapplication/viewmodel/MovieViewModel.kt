@@ -60,6 +60,11 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
             _isLoading.value = false
         }
     }
+
+    suspend fun getRecommendationsForMovie(movieId: Int): List<Movie> {
+        return repository.getSimilarMovies(movieId)
+    }
+
     fun toggleWatchlist(movieId: Int) {
         viewModelScope.launch {
             // Find the movie from anywhere

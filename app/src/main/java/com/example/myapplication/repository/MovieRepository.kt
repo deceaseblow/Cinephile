@@ -65,6 +65,23 @@ class MovieRepository(context: Context) {
         )
     }
 
+    suspend fun getSimilarMovies(movieId: Int): List<Movie> = withContext(Dispatchers.IO) {
+        val response = ApiService.api.getSimilarMovies(movieId)
+        response.results.map {
+            Movie(
+                id = it.id,
+                title = it.title,
+                posterUrl = it.poster_path?.let { path -> "https://image.tmdb.org/t/p/w500$path" },
+                synopsis = it.overview,
+                releaseDate = it.release_date,
+                director = null,
+                cast = null,
+                rating = it.vote_average
+            )
+        }
+    }
+
+
     suspend fun removeFromWatchlist(movieId: Int) {
         movieDao.removeFromWatchlist(movieId)
     }

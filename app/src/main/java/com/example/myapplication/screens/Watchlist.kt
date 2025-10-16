@@ -77,7 +77,7 @@ fun WatchlistScreen(
 
                         Spacer(modifier = Modifier.width(8.dp))
 
-                        // Remove Button
+                        // ❌ Remove Button
                         Button(
                             onClick = { viewModel.toggleWatchlist(movieEntity.id) },
                             modifier = Modifier

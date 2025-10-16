@@ -19,7 +19,8 @@ fun HomeScreen(
     viewModel: MovieViewModel,
     onSearch: (String) -> Unit,
     onMovieClick: (Int) -> Unit,
-    onWatchlistClick: () -> Unit
+    onWatchlistClick: () -> Unit,
+    onRecommendationsClick: () -> Unit
 ) {
     val movies by viewModel.homeMovies.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
@@ -29,7 +30,7 @@ fun HomeScreen(
             TopAppBar(
                 title = { Text("Movie App") },
                 actions = {
-                    IconButton(onClick = onWatchlistClick) { // Go to watchlist
+                    IconButton(onClick = onWatchlistClick) {
                         Icon(Icons.Filled.Favorite, contentDescription = "Watchlist")
                     }
                 }
@@ -55,7 +56,19 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // 🌟 See Recommendations Button
+            Button(
+                onClick = onRecommendationsClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                Text("See Recommendations")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             // 🎬 Movie List
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {

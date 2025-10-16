@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(navController = navController, startDestination = "loading") {
 
-                    // 🌀 Loading Screen
+                    // 🔄 Loading Screen
                     composable("loading") {
                         val isLoading = viewModel.isLoading.collectAsState().value
                         LoadingScreen()
@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    // Home Screen
+                    // 🏠 Home Screen
                     composable("home") {
                         HomeScreen(
                             viewModel = viewModel,
@@ -54,14 +54,16 @@ class MainActivity : ComponentActivity() {
                             },
                             onWatchlistClick = {
                                 navController.navigate("watchlist")
+                            },
+                            onRecommendationsClick = { // 👈 Navigate to Recommendations
+                                navController.navigate("recommendations")
                             }
                         )
                     }
 
-                    // Results Screen
+                    // 🔍 Results Screen
                     composable("results/{query}") { backStackEntry ->
                         val query = backStackEntry.arguments?.getString("query") ?: ""
-
                         ResultScreen(
                             query = query,
                             viewModel = viewModel,
@@ -72,7 +74,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    // Movie Details Screen
+                    // 🎬 Movie Details
                     composable("details/{movieId}") { backStackEntry ->
                         val movieId = backStackEntry.arguments?.getString("movieId")?.toIntOrNull()
                         val movie = viewModel.selectedMovie.collectAsState().value
@@ -85,7 +87,6 @@ class MainActivity : ComponentActivity() {
 
                         movie?.let {
                             val isInWatchlist = viewModel.isInWatchlist(it.id)
-
                             DetailsScreen(
                                 movie = it,
                                 inWatchlist = isInWatchlist,
@@ -97,7 +98,7 @@ class MainActivity : ComponentActivity() {
                         } ?: LoadingScreen()
                     }
 
-                    // Watch list Screen
+                    // 🎞 Watchlist
                     composable("watchlist") {
                         WatchlistScreen(
                             viewModel = viewModel,
@@ -105,6 +106,17 @@ class MainActivity : ComponentActivity() {
                             onMovieClick = { movieId ->
                                 navController.navigate("details/$movieId")
                             }
+                        )
+                    }
+
+                    // 🎯 Recommendations
+                    composable("recommendations") {
+                        RecommendationScreen(
+                            viewModel = viewModel,
+                            onMovieClick = { movieId ->
+                                navController.navigate("details/$movieId")
+                            },
+                            onBack = { navController.popBackStack() } // ✅ Added back button handler
                         )
                     }
                 }
