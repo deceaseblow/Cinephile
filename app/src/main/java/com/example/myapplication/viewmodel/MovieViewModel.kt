@@ -65,32 +65,15 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
         return repository.getSimilarMovies(movieId)
     }
 
-    fun toggleWatchlist(movieId: Int) {
+    fun addToWatchlist(movie: Movie) {
         viewModelScope.launch {
-            // Find the movie from anywhere
-            val movie = _homeMovies.value.find { it.id == movieId }
-                ?: _searchResults.value.find { it.id == movieId }
-                ?: _selectedMovie.value
-                ?: return@launch
+            repository.addToWatchlist(movie)
+        }
+    }
 
-            val isInList = repository.isInWatchlist(movie.id)
-            if (isInList) repository.removeFromWatchlist(movie.id)
-            else repository.addToWatchlist(movie)
-
-            // Now reflect the change in UI
-            val updatedHome = _homeMovies.value.map {
-                if (it.id == movie.id) it.copy(isFavorite = !isInList) else it
-            }
-            val updatedSearch = _searchResults.value.map {
-                if (it.id == movie.id) it.copy(isFavorite = !isInList) else it
-            }
-
-            _homeMovies.value = updatedHome
-            _searchResults.value = updatedSearch
-
-            if (_selectedMovie.value?.id == movie.id) {
-                _selectedMovie.value = _selectedMovie.value?.copy(isFavorite = !isInList)
-            }
+    fun removeFromWatchlist(movieId: Int) {
+        viewModelScope.launch {
+            repository.removeFromWatchlist(movieId)
         }
     }
 

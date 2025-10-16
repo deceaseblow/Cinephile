@@ -6,8 +6,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,12 +23,16 @@ fun DetailsScreen(
     movie: Movie,
     inWatchlist: Boolean,
     onBack: () -> Unit,
+    onAddToWatchlist: (Movie) -> Unit,
+    onRemoveFromWatchlist: (Int) -> Unit,
     onToggleFavorite: () -> Unit,
-    onToggleWatchlist: () -> Unit,
     onRateMovie: (Float) -> Unit
 ) {
     var isInWatchlist by remember { mutableStateOf(inWatchlist) }
-    var isFavorite by remember { mutableStateOf(movie.isFavorite) }
+
+    LaunchedEffect(inWatchlist) {
+        isInWatchlist = inWatchlist
+    }
 
     Scaffold(
         topBar = {
@@ -52,7 +54,7 @@ fun DetailsScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Poster
+            // 🎬 Poster
             Image(
                 painter = rememberAsyncImagePainter(model = movie.posterUrl),
                 contentDescription = movie.title,
@@ -75,22 +77,30 @@ fun DetailsScreen(
             Text("Cast: ${movie.cast ?: "N/A"}")
 
             Spacer(Modifier.height(8.dp))
-            Text(movie.synopsis ?: "No synopsis available.", style = MaterialTheme.typography.bodyMedium)
+            Text(
+                movie.synopsis ?: "No synopsis available.",
+                style = MaterialTheme.typography.bodyMedium
+            )
 
             Spacer(Modifier.height(24.dp))
 
-            // Watchlist button
             Button(
                 onClick = {
+                    if (isInWatchlist) {
+                        onRemoveFromWatchlist(movie.id)
+                    } else {
+                        onAddToWatchlist(movie)
+                    }
+                    // Update local state immediately for smooth UX
                     isInWatchlist = !isInWatchlist
-                    onToggleWatchlist()
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (isInWatchlist)
                         MaterialTheme.colorScheme.primary
                     else
                         MaterialTheme.colorScheme.surfaceVariant
-                )
+                ),
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     if (isInWatchlist) "Remove from Watchlist" else "Add to Watchlist",

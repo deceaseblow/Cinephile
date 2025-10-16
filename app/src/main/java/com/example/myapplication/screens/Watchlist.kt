@@ -65,7 +65,7 @@ fun WatchlistScreen(
                             .fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // 🎬 Movie Card
+                        // Movie Card
                         Box(modifier = Modifier.weight(1f)) {
                             MovieCard(
                                 title = movieEntity.title,
@@ -77,17 +77,17 @@ fun WatchlistScreen(
 
                         Spacer(modifier = Modifier.width(8.dp))
 
-                        // ❌ Remove Button
+                        // Remove Button
                         Button(
-                            onClick = { viewModel.toggleWatchlist(movieEntity.id) },
-                            modifier = Modifier
-                                .height(48.dp),
+                            onClick = { viewModel.removeFromWatchlist(movieEntity.id) },
+                            modifier = Modifier.height(48.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.errorContainer
                             )
                         ) {
                             Text("Remove")
                         }
+
                     }
                 }
             }

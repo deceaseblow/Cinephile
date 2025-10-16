@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(navController = navController, startDestination = "loading") {
 
-                    // 🔄 Loading Screen
+                    // Loading Screen
                     composable("loading") {
                         val isLoading = viewModel.isLoading.collectAsState().value
                         LoadingScreen()
@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    // 🏠 Home Screen
+                    // Home Screen
                     composable("home") {
                         HomeScreen(
                             viewModel = viewModel,
@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    // 🔍 Results Screen
+                    // Results Screen
                     composable("results/{query}") { backStackEntry ->
                         val query = backStackEntry.arguments?.getString("query") ?: ""
                         ResultScreen(
@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    // 🎬 Movie Details
+                    //  Movie Details
                     composable("details/{movieId}") { backStackEntry ->
                         val movieId = backStackEntry.arguments?.getString("movieId")?.toIntOrNull()
                         val movie = viewModel.selectedMovie.collectAsState().value
@@ -88,17 +88,17 @@ class MainActivity : ComponentActivity() {
                         movie?.let {
                             val isInWatchlist = viewModel.isInWatchlist(it.id)
                             DetailsScreen(
-                                movie = it,
+                                movie = it, // ✅ use the movie from ViewModel
                                 inWatchlist = isInWatchlist,
                                 onBack = { navController.popBackStack() },
+                                onAddToWatchlist = { movieToAdd -> viewModel.addToWatchlist(movieToAdd) },
+                                onRemoveFromWatchlist = { movieIdToRemove -> viewModel.removeFromWatchlist(movieIdToRemove) },
                                 onToggleFavorite = { viewModel.toggleFavorite(it.id) },
-                                onToggleWatchlist = { viewModel.toggleWatchlist(it.id) },
                                 onRateMovie = { rating -> viewModel.rateMovie(it.id, rating) }
                             )
                         } ?: LoadingScreen()
                     }
 
-                    // 🎞 Watchlist
                     composable("watchlist") {
                         WatchlistScreen(
                             viewModel = viewModel,
@@ -109,7 +109,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    // 🎯 Recommendations
+                    //  Recommendations
                     composable("recommendations") {
                         RecommendationScreen(
                             viewModel = viewModel,
