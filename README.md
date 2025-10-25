@@ -36,3 +36,9 @@ In your **`local.properties`** file (in project root):
 
 ```properties
 TMDB_API_KEY=your_tmdb_api_key_here
+```
+
+to be done : 
+1. add to favorites, remove from favorites (works like adding to watchlist, and make another favorites screen)
+2. rating adding to movies
+3. quiz generator to be edited
