@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -14,6 +15,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.components.MovieCard
 import com.example.myapplication.viewmodel.MovieViewModel
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.sp
+import com.example.myapplication.R
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,11 +34,19 @@ fun WatchlistScreen(
     onBack: () -> Unit
 ) {
     val watchlist by viewModel.watchlist.collectAsState()
-
+    val valinyFont = FontFamily(Font(R.font.valiny))
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Your Watchlist") },
+                title = {
+                    Text(
+                        "Your Watchlist",
+                        style = TextStyle(
+                            fontFamily = valinyFont,
+                            fontSize = 30.sp
+                        )
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -35,7 +54,10 @@ fun WatchlistScreen(
                             contentDescription = "Back"
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
             )
         }
     ) { padding ->
@@ -62,7 +84,10 @@ fun WatchlistScreen(
                 items(watchlist) { movieEntity ->
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp)) // rounded corners for the whole row
+                            .background(MaterialTheme.colorScheme.surface) // gray background
+                            .padding(8.dp), // inner padding inside the row
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         // Movie Card
@@ -78,17 +103,18 @@ fun WatchlistScreen(
                         Spacer(modifier = Modifier.width(8.dp))
 
                         // Remove Button
-                        Button(
+                        IconButton(
                             onClick = { viewModel.removeFromWatchlist(movieEntity.id) },
-                            modifier = Modifier.height(48.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.errorContainer
-                            )
+                            modifier = Modifier.size(48.dp)
                         ) {
-                            Text("Remove")
+                            Icon(
+                                imageVector = Icons.Filled.Close,
+                                contentDescription = "Remove from watchlist",
+                                tint = MaterialTheme.colorScheme.onErrorContainer
+                            )
                         }
-
                     }
+
                 }
             }
         }

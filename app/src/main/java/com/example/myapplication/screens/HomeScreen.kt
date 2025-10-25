@@ -11,10 +11,24 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.myapplication.R
 import com.example.myapplication.components.MovieCard
 import com.example.myapplication.viewmodel.MovieViewModel
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.filled.List
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,18 +42,31 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
     val movies by viewModel.homeMovies.collectAsState()
-    val watchlist by viewModel.watchlist.collectAsState() // ✅ collect watchlist properly
+    val watchlist by viewModel.watchlist.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
+
+    val buttonFont = FontFamily(Font(R.font.valiny))
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Movie App") },
+                title = {
+                    Text(
+                        "Cinephile",
+                        style = TextStyle(
+                            fontFamily = FontFamily(Font(R.font.cinemafont)),
+                            fontSize = 40.sp
+                        )
+                    )
+                },
                 actions = {
                     IconButton(onClick = onWatchlistClick) {
-                        Icon(Icons.Filled.Favorite, contentDescription = "Watchlist")
+                        Icon(Icons.Filled.List, contentDescription = "Watchlist")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
             )
         }
     ) { padding ->
@@ -49,7 +76,7 @@ fun HomeScreen(
                 .padding(16.dp)
                 .fillMaxSize()
         ) {
-            // 🔍 Search Bar
+            // Search Bar
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
@@ -59,24 +86,30 @@ fun HomeScreen(
                         Icon(Icons.Filled.Search, contentDescription = "Search")
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(50.dp)
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // 🌟 See Recommendations Button
+            // See Recommendations Button
             Button(
                 onClick = onRecommendationsClick,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .padding(vertical = 8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text("See Recommendations")
+                Text(
+                    "See Recommendations",
+                    fontFamily = buttonFont,
+                    fontSize = 20.sp
+                )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 🧠 Take a Quiz Button
+            //  Take a Quiz Button
             Button(
                 onClick = {
                     if (watchlist.isEmpty()) {
@@ -89,14 +122,19 @@ fun HomeScreen(
                         navController.navigate("quiz")
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
             ) {
-                Text("Take a Quiz now! ")
+                Text(
+                    "Take a Quiz Now!",
+                    fontFamily = buttonFont,
+                    fontSize = 20.sp
+                )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // 🎬 Movie List
+            //  Movie List
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(movies) { movie ->
                     MovieCard(
